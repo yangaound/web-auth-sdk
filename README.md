@@ -12,7 +12,7 @@ Clients should authenticate by passing credentials or authorizations. For exampl
    ```
 
 ## Requirements
-- Python 3.9+
+- Python 3.8+
 
 ## Permission Representation
 1. Permission list, located at `usr/etc/permissions.json` file:

@@ -1,11 +1,11 @@
 from typing import Callable, Iterable, Union
 
 from .config import Config
+from .domain.authorization import Authorization, JWTAuthorization
 from .domain.context import Context
 from .domain.enum import ErrorCode, PermissionAggregationTypeEnum
 from .domain.exception import AuthException
 from .domain.web_bridge import ConsumerInfo, WebBridge
-
 
 _ = (
     Config,
@@ -14,6 +14,8 @@ _ = (
     AuthException,
     ConsumerInfo,
     ErrorCode,
+    Authorization,
+    JWTAuthorization,
 )
 
 configure = Config.configure

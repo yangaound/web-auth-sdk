@@ -54,9 +54,9 @@ class JWTAuthorization(Authorization):
         permissions: set[str],
         aggregation_type: PermissionAggregationTypeEnum,
         permission_bitmask: str,
-        permission_sets: list[PermissionModel],
+        permission_models: list[PermissionModel],
     ):
-        permission_codename_bitmap = {p.codename: p.bitmask_idx for p in permission_sets}
+        permission_codename_bitmap = {p.codename: p.bitmask_idx for p in permission_models}
         permission_bitmask_len = len(permission_bitmask)
         for codename in permissions:
             bitmask_idx = permission_codename_bitmap.get(codename)
