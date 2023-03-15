@@ -5,14 +5,15 @@ from .domain.authorization import Authorization, JWTAuthorization
 from .domain.context import Context
 from .domain.enum import ErrorCode, PermissionAggregationTypeEnum
 from .domain.exception import AuthException
-from .domain.web_bridge import ConsumerInfo, WebBridge
+from .domain.model import Consumer
+from .domain.web_bridge import WebBridge
 
 _ = (
     Config,
     WebBridge,
     Context,
     AuthException,
-    ConsumerInfo,
+    Consumer,
     ErrorCode,
     Authorization,
     JWTAuthorization,

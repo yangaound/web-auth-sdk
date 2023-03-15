@@ -1,7 +1,7 @@
 import pytest
 from flask import Flask, jsonify
 
-from web_auth import AuthException, Config, ConsumerInfo, ErrorCode
+from web_auth import AuthException, Config, Consumer, ErrorCode
 
 
 @pytest.fixture(scope='module')
@@ -32,8 +32,8 @@ def flask_server(jwt_payload):
 
     @app.route('/inject-consumer-info', methods=['POST'])
     @context([])
-    def inject_consumer_info(consumer_info: ConsumerInfo):
-        assert consumer_info == jwt_payload
+    def inject_consumer_info(consumer: Consumer):
+        assert consumer == jwt_payload
         return jsonify('Hello!')
 
     @app.errorhandler(AuthException)

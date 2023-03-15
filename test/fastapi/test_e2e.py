@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 from starlette.responses import JSONResponse
 
-from web_auth import AuthException, Config, ConsumerInfo, ErrorCode
+from web_auth import AuthException, Config, Consumer, ErrorCode
 
 
 @pytest.fixture(scope='module')
@@ -35,8 +35,8 @@ def fastapi_server(jwt_payload):
 
     @fast_app.post('/inject-consumer-info')
     @context([])
-    async def inject_consumer(consumer_info: ConsumerInfo):
-        assert consumer_info == jwt_payload
+    async def inject_consumer(consumer: Consumer):
+        assert consumer == jwt_payload
         return 'Hello!'
 
     @fast_app.exception_handler(AuthException)

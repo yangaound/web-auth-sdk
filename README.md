@@ -13,6 +13,8 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
 ## Requirements
 - Python 3.8+
+- Flask 2.0+ (optional)
+- FastAPI 0.70+ (optional)
 
 ## Permission Representation
 1. Permission list, located at `usr/etc/permissions.json` file:
@@ -49,7 +51,6 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 - ### FastAPI
 
     ```python
-    import fastapi
     import web_auth
     
     web_auth.configure()
@@ -81,7 +82,6 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 - ### Use instanced context
 
     ```python
-    import fastapi
     import web_auth
     from web_auth.web_bridge.fastapi import FastapiBridge
     from web_auth.storage.file import FileStorage
@@ -113,13 +113,13 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     )
     
     @fastapi.get('/profile')
-    def get_profile(request: fastapi.Request, consumer_info: web_auth.ConsumerInfo) -> web_auth.ConsumerInfo:
+    def get_profile(request: fastapi.Request, consumer: web_auth.Consumer) -> web_auth.Consumer:
         # raise `web_auth.AuthException` if the consumer does not have permission
         context.web_bridge.access_control(
             request=request, 
             permissions={'view_ticket'},
             aggregation_type=web_auth.PermissionAggregationTypeEnum.ALL,
         )
-        return consumer_info
+        return consumer
 
     ```

@@ -1,12 +1,18 @@
 from functools import wraps
 from inspect import Parameter, signature
-from typing import Any
 
 from fastapi import Depends, Request
 from fastapi.security import HTTPBearer
 
-from web_auth import AuthException, ConsumerInfo, Context, ErrorCode, PermissionAggregationTypeEnum, WebBridge
-from web_auth.domain.authorization import JWTAuthorization
+from web_auth import (
+    AuthException,
+    Consumer,
+    Context,
+    ErrorCode,
+    JWTAuthorization,
+    PermissionAggregationTypeEnum,
+    WebBridge,
+)
 
 
 class FastapiBridge(WebBridge):
@@ -27,7 +33,7 @@ class FastapiBridge(WebBridge):
                 (k for k, v in func_signature.parameters.items() if v.annotation is Request), None
             )
             jwt_payload_parma_name = next(
-                (k for k, v in func_signature.parameters.items() if v.annotation is ConsumerInfo), None
+                (k for k, v in func_signature.parameters.items() if v.annotation is Consumer), None
             )
 
             @wraps(func)
@@ -36,7 +42,7 @@ class FastapiBridge(WebBridge):
             ):
                 if request_parma_name:
                     kwargs[request_parma_name] = _request_
-                jwt_payload: ConsumerInfo = self.access_control(_request_, permissions, aggregation_type)
+                jwt_payload: Consumer = self.access_control(_request_, permissions, aggregation_type)
                 if jwt_payload_parma_name:
                     kwargs[jwt_payload_parma_name] = jwt_payload
                 return await func(*args, **kwargs)
@@ -53,7 +59,7 @@ class FastapiBridge(WebBridge):
             )
             updated_parameters = [
                 *filter(
-                    lambda p: p.annotation is not ConsumerInfo,
+                    lambda p: p.annotation is not Consumer,
                     func_signature.parameters.values(),
                 ),
                 Parameter('_request_', Parameter.POSITIONAL_OR_KEYWORD, annotation=Request, default=None),
@@ -67,8 +73,8 @@ class FastapiBridge(WebBridge):
 
         return decorator
 
-    def authenticate(self, request: Request) -> tuple[dict[str, Any], str]:
-        """Authenticate requests. return (consumer_info, consumer_info_type)
+    def authenticate(self, request: Request) -> tuple[Consumer, str]:
+        """Authenticate requests. return (consumer, consumer_auth_type)
 
         :param request: the HTTP request object
         """
@@ -81,5 +87,5 @@ class FastapiBridge(WebBridge):
         if not _token:
             raise AuthException(message='Unauthorized', code=ErrorCode.UNAUTHORIZED)
 
-        consumer_info, consumer_info_type = self.decode_jwt_token(_token), 'JWT'
-        return consumer_info, consumer_info_type
+        consumer, consumer_auth_type = self.decode_jwt_token(_token), 'JWT'
+        return consumer, consumer_auth_type

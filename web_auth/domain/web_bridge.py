@@ -1,17 +1,12 @@
 import abc
 import re
-from typing import Any
 
 import jwt
 
 from .authorization import Authorization, JWTAuthorization
 from .enum import ErrorCode, PermissionAggregationTypeEnum
 from .exception import AuthException
-
-
-class ConsumerInfo(dict):
-    """This data structure can be used by developers as a parameter in view functions to retrieve consumer information.
-    """
+from .model import Consumer
 
 
 class WebBridge(abc.ABC):
@@ -20,7 +15,7 @@ class WebBridge(abc.ABC):
 
     To do so, you need to inject a `Authorization` interface implementation and implement two abstract methods:
      1. `create_view_func_wrapper`: Create a callable to wrap view functions to require `permissions` to perform.
-     2. `authenticate`: Authenticate requests and return (consumer_info, consumer_info_type)
+     2. `authenticate`: Authenticate requests and return (consumer, consumer_auth_type)
     """
 
     authorization_class: Authorization = JWTAuthorization
@@ -48,7 +43,7 @@ class WebBridge(abc.ABC):
         request,
         permissions: set[str],
         aggregation_type: PermissionAggregationTypeEnum = PermissionAggregationTypeEnum.ALL,
-    ) -> dict[str, Any]:
+    ) -> Consumer:
         """Access control mechanism. Call the `authenticate` method to authenticate the client and delegate the
         authorization logic to the `Authorization` class that determines if a user has the required permissions
         to perform an action.
@@ -83,8 +78,8 @@ class WebBridge(abc.ABC):
         """
 
     @abc.abstractmethod
-    def authenticate(self, request) -> tuple[dict[str, Any], str]:
-        """Authenticate requests. return (consumer_info, consumer_info_type)
+    def authenticate(self, request) -> tuple[Consumer, str]:
+        """Authenticate requests. return (consumer, consumer_auth_type)
 
         :param request: the HTTP request object
         :type request: Union['fastapi.Request', 'flask.Request', 'django.http.Request' ... etc]

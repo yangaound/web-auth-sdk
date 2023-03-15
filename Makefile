@@ -1,4 +1,4 @@
-.PHONY: format lint build clean test
+.PHONY: format lint test
 
 all: format lint
 
@@ -18,3 +18,6 @@ test_fastapi:
 
 test_flask:
 	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi
+
+test_py_version:
+	poetry run tox

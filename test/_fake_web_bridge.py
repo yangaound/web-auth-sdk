@@ -1,8 +1,6 @@
 from pathlib import Path
-from typing import Any
 
-from web_auth import Context, PermissionAggregationTypeEnum, WebBridge
-from web_auth.domain.authorization import JWTAuthorization
+from web_auth import Consumer, Context, JWTAuthorization, PermissionAggregationTypeEnum, WebBridge
 
 
 class FakeWebBridge(WebBridge):
@@ -22,13 +20,13 @@ class FakeWebBridge(WebBridge):
         self.context.logger.debug(f'Wrapped view-func `{wrapper}`, which require permissions `{permissions}`')
         return wrapper
 
-    def authenticate(self, request: Path) -> tuple[dict[str, Any], str]:
-        """Authenticate requests. return (consumer_info, consumer_info_type)
+    def authenticate(self, request: Path) -> tuple[Consumer, str]:
+        """Authenticate requests. return (consumer, consumer_auth_type)
 
         :param request: A file path object whose content is a JWT
         """
         with request.open(encoding='utf8') as fp:
             _token = fp.readline().strip()
 
-        consumer_info, consumer_info_type = self.decode_jwt_token(_token), 'JWT'
-        return consumer_info, consumer_info_type
+        consumer, consumer_auth_type = self.decode_jwt_token(_token), 'JWT'
+        return consumer, consumer_auth_type

@@ -1,12 +1,18 @@
 from functools import wraps
 from inspect import signature
-from typing import Any
 
 from flask import Request
 from flask import request as flask_request
 
-from web_auth import AuthException, ConsumerInfo, Context, ErrorCode, PermissionAggregationTypeEnum, WebBridge
-from web_auth.domain.authorization import JWTAuthorization
+from web_auth import (
+    AuthException,
+    Consumer,
+    Context,
+    ErrorCode,
+    JWTAuthorization,
+    PermissionAggregationTypeEnum,
+    WebBridge,
+)
 
 
 class FlaskBridge(WebBridge):
@@ -26,7 +32,7 @@ class FlaskBridge(WebBridge):
         def decorator(func):
             func_signature = signature(func)
             jwt_payload_parma_name = next(
-                (k for k, v in func_signature.parameters.items() if v.annotation is ConsumerInfo), None
+                (k for k, v in func_signature.parameters.items() if v.annotation is Consumer), None
             )
 
             @wraps(func)
@@ -40,7 +46,7 @@ class FlaskBridge(WebBridge):
             # Make parameters to override signature
             updated_parameters = [
                 *filter(
-                    lambda p: p.annotation is not ConsumerInfo,
+                    lambda p: p.annotation is not Consumer,
                     func_signature.parameters.values(),
                 )
             ]
@@ -51,8 +57,8 @@ class FlaskBridge(WebBridge):
 
         return decorator
 
-    def authenticate(self, request: Request) -> tuple[dict[str, Any], str]:
-        """Authenticate requests. return (consumer_info, consumer_info_type)
+    def authenticate(self, request: Request) -> tuple[Consumer, str]:
+        """Authenticate requests. return (consumer, consumer_auth_type)
 
         :param request: the HTTP request object
         """
@@ -65,5 +71,5 @@ class FlaskBridge(WebBridge):
         if not _token:
             raise AuthException(message='Unauthorized', code=ErrorCode.UNAUTHORIZED)
 
-        consumer_info, consumer_info_type = self.decode_jwt_token(_token), 'JWT'
-        return consumer_info, consumer_info_type
+        consumer, consumer_auth_type = self.decode_jwt_token(_token), 'JWT'
+        return consumer, consumer_auth_type
