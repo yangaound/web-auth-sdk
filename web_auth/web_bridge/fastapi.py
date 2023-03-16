@@ -32,29 +32,29 @@ class FastapiBridge(WebBridge):
             request_parma_name = next(
                 (k for k, v in func_signature.parameters.items() if v.annotation is Request), None
             )
-            jwt_payload_parma_name = next(
+            consumer_parma_name = next(
                 (k for k, v in func_signature.parameters.items() if v.annotation is Consumer), None
             )
 
             @wraps(func)
             async def wrapper(
-                _request_: Request = None, _token_=Depends(HTTPBearer(auto_error=False)), *args, **kwargs
+                _request_: Request = None, _http_bearer_=Depends(HTTPBearer(auto_error=False)), *args, **kwargs
             ):
                 if request_parma_name:
                     kwargs[request_parma_name] = _request_
-                jwt_payload: Consumer = self.access_control(_request_, permissions, aggregation_type)
-                if jwt_payload_parma_name:
-                    kwargs[jwt_payload_parma_name] = jwt_payload
+                consumer: Consumer = self.access_control(_request_, permissions, aggregation_type)
+                if consumer_parma_name:
+                    kwargs[consumer_parma_name] = consumer
                 return await func(*args, **kwargs)
 
             # Make parameters to override signature
-            token_parameters = (
+            http_bearer_params = (
                 [
                     Parameter(
-                        '_token_', Parameter.POSITIONAL_OR_KEYWORD, default=Depends(HTTPBearer(auto_error=False))
+                        '_http_bearer_', Parameter.POSITIONAL_OR_KEYWORD, default=Depends(HTTPBearer(auto_error=False))
                     ),
                 ]
-                if jwt_payload_parma_name
+                if consumer_parma_name
                 else []
             )
             updated_parameters = [
@@ -63,7 +63,7 @@ class FastapiBridge(WebBridge):
                     func_signature.parameters.values(),
                 ),
                 Parameter('_request_', Parameter.POSITIONAL_OR_KEYWORD, annotation=Request, default=None),
-                *token_parameters,
+                *http_bearer_params,
             ]
             # Override signature
             wrapper.__signature__ = func_signature.replace(parameters=tuple(updated_parameters))

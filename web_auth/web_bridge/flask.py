@@ -31,16 +31,16 @@ class FlaskBridge(WebBridge):
 
         def decorator(func):
             func_signature = signature(func)
-            jwt_payload_parma_name = next(
+            consumer_parma_name = next(
                 (k for k, v in func_signature.parameters.items() if v.annotation is Consumer), None
             )
 
             @wraps(func)
             def wrapper(*args, **kwargs):
-                jwt_payload = self.access_control(flask_request, permissions, aggregation_type)
+                consumer = self.access_control(flask_request, permissions, aggregation_type)
 
-                if jwt_payload_parma_name:
-                    kwargs[jwt_payload_parma_name] = jwt_payload
+                if consumer_parma_name:
+                    kwargs[consumer_parma_name] = consumer
                 return func(*args, **kwargs)
 
             # Make parameters to override signature
