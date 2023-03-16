@@ -19,5 +19,5 @@ test_fastapi:
 test_flask:
 	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi
 
-test_py_version:
+test_versions:
 	poetry run tox

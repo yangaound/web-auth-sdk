@@ -8,19 +8,19 @@ from .domain.web_bridge import WebBridge
 
 
 class Config:
+    DEFAULT_CONTEXT_CLASS = 'web_auth.domain.context.Context'
+    DEFAULT_WEB_BRIDGE_CLASS = 'web_auth.web_bridge.fastapi.FastapiBridge'
+    DEFAULT_STORAGE_CLASS = 'web_auth.storage.JsonFileStorage'
+    DEFAULT_STORAGE_PARAMS = {
+        'permission_file_path': 'usr/etc/permissions.json',
+        'ttl': 60,
+    }
+
     _globals_context: Optional[Context] = None
 
     @classmethod
     def get_globals_context(cls) -> Optional[Context]:
         return cls._globals_context
-
-    DEFAULT_CONTEXT_CLASS = 'web_auth.domain.context.Context'
-    DEFAULT_WEB_BRIDGE_CLASS = 'web_auth.web_bridge.fastapi.FastapiBridge'
-    DEFAULT_STORAGE_CLASS = 'web_auth.storage.file.FileStorage'
-    DEFAULT_STORAGE_PARAMS = {
-        'permission_file_path': 'usr/etc/permissions.json',
-        'ttl': 60,
-    }
 
     @staticmethod
     def _import_cls_string(dotted_cls_path):
@@ -37,8 +37,8 @@ class Config:
     @classmethod
     def configure(
         cls,
-        context_class: Union[Context, str] = None,
         logger_name: Optional[str] = None,
+        context_class: Union[Context, str] = None,
         web_bridge_class: Union[WebBridge, str] = None,
         storage_class: Union[Storage, str] = None,
         storage_params: dict[str, any] = None,
@@ -61,11 +61,11 @@ class Config:
     @classmethod
     def build_context(
         cls,
-        context_class: Union[Context, str] = None,
         logger_name: Optional[str] = None,
-        web_bridge_class: Union[WebBridge, str] = None,
-        storage_class: Union[Storage, str] = None,
-        storage_params: dict[str, any] = None,
+        context_class: Union[Context, str] = None,  # assumed to use `cls.DEFAULT_CONTEXT_CLASS`
+        web_bridge_class: Union[WebBridge, str] = None,  # assumed use `cls.DEFAULT_WEB_BRIDGE_CLASS`
+        storage_class: Union[Storage, str] = None,  # assumed to use `cls.DEFAULT_STORAGE_CLASS`
+        storage_params: dict[str, any] = None,  # assumed to use `cls.DEFAULT_STORAGE_PARAMS`
         **kwargs,
     ) -> Context:
         """Create a configuration context. For omitted arguments, copy the items of the global context.
@@ -96,16 +96,6 @@ class Config:
         context.logger_name = logger_name or globals_context and globals_context.logger_name
         context.logger = logging.getLogger(context.logger_name)
 
-        # Init WebBridge
-        web_bridge_class = (
-            web_bridge_class or (globals_context and type(globals_context.web_bridge)) or cls.DEFAULT_WEB_BRIDGE_CLASS
-        )
-        if web_bridge_class == cls.DEFAULT_WEB_BRIDGE_CLASS:
-            context.logger.debug(f'Assumed to use `{cls.DEFAULT_WEB_BRIDGE_CLASS}`.')
-
-        _class = cls._import_cls_string(web_bridge_class) if isinstance(web_bridge_class, str) else web_bridge_class
-        context.web_bridge = _class(context=context)
-
         # Init Storage
         storage_class = (
             storage_class or (globals_context and type(globals_context.storage)) or cls.DEFAULT_STORAGE_CLASS
@@ -118,9 +108,21 @@ class Config:
         context.storage_params = (
             storage_params or (globals_context and globals_context.storage_params) or cls.DEFAULT_STORAGE_PARAMS
         )
-        context.storage = _class(context=context, **context.storage_params)
+        context.storage = _class(**context.storage_params)
 
-        context.customize_init(**kwargs)
+        # Customize init
+        context.kwargs = kwargs
+        context.customize_init()
+
+        # Finally, init WebBridge
+        web_bridge_class = (
+            web_bridge_class or (globals_context and type(globals_context.web_bridge)) or cls.DEFAULT_WEB_BRIDGE_CLASS
+        )
+        if web_bridge_class == cls.DEFAULT_WEB_BRIDGE_CLASS:
+            context.logger.debug(f'Assumed to use `{cls.DEFAULT_WEB_BRIDGE_CLASS}`.')
+
+        _class = cls._import_cls_string(web_bridge_class) if isinstance(web_bridge_class, str) else web_bridge_class
+        context.web_bridge = _class(context=context)
 
         if not globals_context:
             cls._globals_context = context

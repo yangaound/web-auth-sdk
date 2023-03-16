@@ -84,11 +84,10 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     ```python
     import web_auth
     from web_auth.web_bridge.fastapi import FastapiBridge
-    from web_auth.storage.file import FileStorage
     
     context = web_auth.build_context(
         web_bridge_class=FastapiBridge,
-        storage_class=FileStorage,
+        storage_class=web_auth.Config.DEFAULT_STORAGE_CLASS,
         storage_params=web_auth.Config.DEFAULT_STORAGE_PARAMS,
     )  
     
@@ -100,15 +99,15 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     ```
 
 - ### Implement access control & retrieve the consumer info
+
     ```python
     import fastapi
     import web_auth
     from web_auth.web_bridge.fastapi import FastapiBridge
-    from web_auth.storage.file import FileStorage
     
     context = web_auth.build_context(
         web_bridge_class=FastapiBridge,
-        storage_class=FileStorage,
+        storage_class=web_auth.JsonFileStorage,
         storage_params=web_auth.Config.DEFAULT_STORAGE_PARAMS,
     )
     

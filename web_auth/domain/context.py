@@ -14,6 +14,7 @@ class Context:
     web_bridge: WebBridge
     logger: logging.Logger
     logger_name: str
+    kwargs: dict[str, Any]
 
     def _validate_required_permissions(self, required_permissions: Union[str, Iterable[str]]) -> set[str]:
         validated_permissions = (
@@ -42,5 +43,5 @@ class Context:
             aggregation_type=aggregation_type,
         )
 
-    def customize_init(self, *args, **kwargs):
+    def customize_init(self):
         """Add customized attrs"""

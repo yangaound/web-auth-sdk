@@ -6,6 +6,7 @@ from .domain.context import Context
 from .domain.enum import ErrorCode, PermissionAggregationTypeEnum
 from .domain.exception import AuthException
 from .domain.model import Consumer
+from .domain.storage import JsonFileStorage
 from .domain.web_bridge import WebBridge
 
 _ = (
@@ -15,6 +16,7 @@ _ = (
     AuthException,
     Consumer,
     ErrorCode,
+    JsonFileStorage,
     Authorization,
     JWTAuthorization,
 )
