@@ -8,7 +8,7 @@ from web_auth import Config
 
 @pytest.fixture(scope='session')
 def fastapi_global_context():
-    from web_auth.bridges.fastapi import FastapiBridge
+    from web_auth.fastapi import FastapiBridge
 
     global_decorator = Config.configure(
         bridge_class=FastapiBridge,
@@ -19,7 +19,7 @@ def fastapi_global_context():
 
 @pytest.fixture(scope='session')
 def flask_global_context():
-    from web_auth.bridges.flask import FlaskBridge
+    from web_auth.flask import FlaskBridge
 
     global_decorator = Config.configure(
         bridge_class=FlaskBridge,

@@ -2,14 +2,14 @@ import logging
 from importlib import import_module
 from typing import Optional, Union
 
-from .domain.bridge import WebBridge
-from .domain.context import Context
-from .domain.storage import Storage
+from .core.bridge import WebBridge
+from .core.context import Context
+from .core.storage import Storage
 
 
 class Config:
-    DEFAULT_CONTEXT_CLASS = 'web_auth.domain.context.Context'
-    DEFAULT_BRIDGE_CLASS = 'web_auth.bridges.fastapi.FastapiBridge'
+    DEFAULT_CONTEXT_CLASS = 'web_auth.core.context.Context'
+    DEFAULT_BRIDGE_CLASS = 'web_auth.fastapi.FastapiBridge'
     DEFAULT_STORAGE_CLASS = 'web_auth.storage.JsonFileStorage'
     DEFAULT_STORAGE_PARAMS = {
         'permission_file_path': 'usr/etc/permissions.json',

@@ -6,7 +6,7 @@ from web_auth import AuthException, Config, Consumer, ErrorCode
 
 @pytest.fixture(scope='module')
 def flask_server(jwt_payload):
-    from web_auth.bridges.flask import FlaskBridge
+    from web_auth.flask import FlaskBridge
 
     context = Config.build_context(
         bridge_class=FlaskBridge,

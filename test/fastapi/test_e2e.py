@@ -8,7 +8,7 @@ from web_auth import AuthException, Config, Consumer, ErrorCode
 
 @pytest.fixture(scope='module')
 def fastapi_server(jwt_payload):
-    from web_auth.bridges.fastapi import FastapiBridge
+    from web_auth.fastapi import FastapiBridge
 
     context = Config.build_context(
         bridge_class=FastapiBridge,

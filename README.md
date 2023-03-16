@@ -73,7 +73,7 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
     ```python
     import web_auth
-    from web_auth.bridges.flask import FlaskBridge
+    from web_auth.flask import FlaskBridge
     
     web_auth.configure(
         bridge_class=FlaskBridge,
@@ -90,7 +90,7 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
     ```python
     import web_auth
-    from web_auth.bridges.fastapi import FastapiBridge
+    from web_auth.fastapi import FastapiBridge
     
     context = web_auth.build_context(
         bridge_class=FastapiBridge,
@@ -110,7 +110,7 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     ```python
     import fastapi
     import web_auth
-    from web_auth.bridges.fastapi import FastapiBridge
+    from web_auth.fastapi import FastapiBridge
     
     context = web_auth.build_context(
         bridge_class=FastapiBridge,

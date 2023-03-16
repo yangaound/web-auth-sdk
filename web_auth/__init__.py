@@ -1,13 +1,13 @@
 from typing import Iterable, Union
 
 from .config import Config
-from .domain.authorization import Authorization, JWTAuthorization
-from .domain.bridge import WebBridge
-from .domain.context import Context
-from .domain.enum import ErrorCode, PermissionAggregationTypeEnum
-from .domain.exception import AuthException
-from .domain.model import Consumer
-from .domain.storage import JsonFileStorage
+from .core.authorization import Authorization, JWTAuthorization
+from .core.bridge import WebBridge
+from .core.context import Context
+from .core.enum import ErrorCode, PermissionAggregationTypeEnum
+from .core.exception import AuthException
+from .core.model import Consumer
+from .core.storage import JsonFileStorage
 
 _ = (
     Config,
