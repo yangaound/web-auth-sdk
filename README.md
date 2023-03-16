@@ -13,8 +13,15 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
 ## Requirements
 - Python 3.8+
+- FastAPI 0.80+ (recommended)
 - Flask 2.0+ (optional)
-- FastAPI 0.70+ (optional)
+
+## Installation
+   ```shell
+   make build
+   pip install dist/web_auth_sdk-0.1.0.tar.gz
+   ```
+
 
 ## Permission Representation
 1. Permission list, located at `usr/etc/permissions.json` file:
@@ -66,10 +73,10 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
     ```python
     import web_auth
-    from web_auth.web_bridge.flask import FlaskBridge
+    from web_auth.bridges.flask import FlaskBridge
     
     web_auth.configure(
-        web_bridge_class=FlaskBridge,
+        bridge_class=FlaskBridge,
     )
     
     @blueprint.route('/tickets', methods=['GET'])
@@ -83,10 +90,10 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
     ```python
     import web_auth
-    from web_auth.web_bridge.fastapi import FastapiBridge
+    from web_auth.bridges.fastapi import FastapiBridge
     
     context = web_auth.build_context(
-        web_bridge_class=FastapiBridge,
+        bridge_class=FastapiBridge,
         storage_class=web_auth.Config.DEFAULT_STORAGE_CLASS,
         storage_params=web_auth.Config.DEFAULT_STORAGE_PARAMS,
     )  
@@ -103,10 +110,10 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     ```python
     import fastapi
     import web_auth
-    from web_auth.web_bridge.fastapi import FastapiBridge
+    from web_auth.bridges.fastapi import FastapiBridge
     
     context = web_auth.build_context(
-        web_bridge_class=FastapiBridge,
+        bridge_class=FastapiBridge,
         storage_class=web_auth.JsonFileStorage,
         storage_params=web_auth.Config.DEFAULT_STORAGE_PARAMS,
     )
@@ -114,7 +121,7 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     @fastapi.get('/profile')
     def get_profile(request: fastapi.Request, consumer: web_auth.Consumer) -> web_auth.Consumer:
         # raise `web_auth.AuthException` if the consumer does not have permission
-        context.web_bridge.access_control(
+        context.bridge.access_control(
             request=request, 
             permissions={'view_ticket'},
             aggregation_type=web_auth.PermissionAggregationTypeEnum.ALL,

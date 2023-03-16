@@ -1,9 +1,9 @@
 import logging
 from typing import Any, Iterable, Union
 
+from .bridge import WebBridge
 from .enum import PermissionAggregationTypeEnum
 from .storage import Storage
-from .web_bridge import WebBridge
 
 
 class Context:
@@ -11,7 +11,7 @@ class Context:
 
     storage: Storage
     storage_params: dict[str, Any]
-    web_bridge: WebBridge
+    bridge: WebBridge
     logger: logging.Logger
     logger_name: str
     kwargs: dict[str, Any]
@@ -38,10 +38,12 @@ class Context:
         """
 
         permissions = self._validate_required_permissions(required_permissions)
-        return self.web_bridge.create_view_func_wrapper(
+        return self.bridge.create_view_func_wrapper(
             permissions=permissions,
             aggregation_type=aggregation_type,
         )
+
+    permissions = __call__
 
     def customize_init(self):
         """Add customized attrs"""

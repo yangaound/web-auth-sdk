@@ -2,14 +2,14 @@ import logging
 from importlib import import_module
 from typing import Optional, Union
 
+from .domain.bridge import WebBridge
 from .domain.context import Context
 from .domain.storage import Storage
-from .domain.web_bridge import WebBridge
 
 
 class Config:
     DEFAULT_CONTEXT_CLASS = 'web_auth.domain.context.Context'
-    DEFAULT_WEB_BRIDGE_CLASS = 'web_auth.web_bridge.fastapi.FastapiBridge'
+    DEFAULT_BRIDGE_CLASS = 'web_auth.bridges.fastapi.FastapiBridge'
     DEFAULT_STORAGE_CLASS = 'web_auth.storage.JsonFileStorage'
     DEFAULT_STORAGE_PARAMS = {
         'permission_file_path': 'usr/etc/permissions.json',
@@ -39,7 +39,7 @@ class Config:
         cls,
         logger_name: Optional[str] = None,
         context_class: Union[Context, str] = None,
-        web_bridge_class: Union[WebBridge, str] = None,
+        bridge_class: Union[WebBridge, str] = None,
         storage_class: Union[Storage, str] = None,
         storage_params: dict[str, any] = None,
         **kwargs,
@@ -50,7 +50,7 @@ class Config:
             cls._globals_context: Context = cls.build_context(
                 context_class=context_class,
                 logger_name=logger_name,
-                web_bridge_class=web_bridge_class,
+                bridge_class=bridge_class,
                 storage_class=storage_class,
                 storage_params=storage_params,
                 **kwargs,
@@ -63,17 +63,17 @@ class Config:
         cls,
         logger_name: Optional[str] = None,
         context_class: Union[Context, str] = None,  # assumed to use `cls.DEFAULT_CONTEXT_CLASS`
-        web_bridge_class: Union[WebBridge, str] = None,  # assumed use `cls.DEFAULT_WEB_BRIDGE_CLASS`
+        bridge_class: Union[WebBridge, str] = None,  # assumed use `cls.DEFAULT_BRIDGE_CLASS`
         storage_class: Union[Storage, str] = None,  # assumed to use `cls.DEFAULT_STORAGE_CLASS`
         storage_params: dict[str, any] = None,  # assumed to use `cls.DEFAULT_STORAGE_PARAMS`
         **kwargs,
     ) -> Context:
         """Create a configuration context. For omitted arguments, copy the items of the global context.
 
+        :param logger_name: the name of the logger to use.
         :param context_class: context class to use. It can be either a string representing the path to the context
             class or the context class itself.
-        :param logger_name: the name of the logger to use.
-        :param web_bridge_class: the web bridge class to use. It can be either a string representing the path to the
+        :param bridge_class: the web bridge class to use. It can be either a string representing the path to the
             web bridge class or the web bridge class itself.
         :param storage_class: the storage class to use. It can be either a string representing the path to the storage
             class or the storage class itself.
@@ -115,14 +115,12 @@ class Config:
         context.customize_init()
 
         # Finally, init WebBridge
-        web_bridge_class = (
-            web_bridge_class or (globals_context and type(globals_context.web_bridge)) or cls.DEFAULT_WEB_BRIDGE_CLASS
-        )
-        if web_bridge_class == cls.DEFAULT_WEB_BRIDGE_CLASS:
-            context.logger.debug(f'Assumed to use `{cls.DEFAULT_WEB_BRIDGE_CLASS}`.')
+        bridge_class = bridge_class or (globals_context and type(globals_context.bridge)) or cls.DEFAULT_BRIDGE_CLASS
+        if bridge_class == cls.DEFAULT_BRIDGE_CLASS:
+            context.logger.debug(f'Assumed to use `{cls.DEFAULT_BRIDGE_CLASS}`.')
 
-        _class = cls._import_cls_string(web_bridge_class) if isinstance(web_bridge_class, str) else web_bridge_class
-        context.web_bridge = _class(context=context)
+        _class = cls._import_cls_string(bridge_class) if isinstance(bridge_class, str) else bridge_class
+        context.bridge = _class(context=context)
 
         if not globals_context:
             cls._globals_context = context

@@ -28,5 +28,5 @@ class FakeWebBridge(WebBridge):
         with request.open(encoding='utf8') as fp:
             _token = fp.readline().strip()
 
-        consumer, consumer_auth_type = self.decode_jwt_token(_token), 'JWT'
-        return consumer, consumer_auth_type
+        jwt_payload = self.decode_jwt_token(_token)
+        return Consumer(**jwt_payload), 'JWT'

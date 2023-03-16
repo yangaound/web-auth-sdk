@@ -28,6 +28,7 @@ python = ">=3.8.0,<=3.10"
 PyJWT = ">=2.2.0,<3.0"
 httpx = "^0.23.3"
 requests = "^2.28.2"
+pydantic = "^1.10.6"
 
 [tool.poetry.dev-dependencies]
 fastapi = "^0.81.0"

@@ -29,8 +29,8 @@ class JWTAuthorization(Authorization):
     """
 
     def authorize(self, consumer_info: tuple[Consumer, str], permissions, aggregation_type):
-        jwt_payload, _ = consumer_info
-        permission_bitmask = self.convert_base64encoded_to_bitmask(jwt_payload['permission_bitmask'])
+        consumer, _ = consumer_info
+        permission_bitmask = self.convert_base64encoded_to_bitmask(consumer.permission_bitmask)
         return self.check_permissions(
             permissions,
             aggregation_type,
@@ -59,7 +59,7 @@ class JWTAuthorization(Authorization):
         permission_bitmask_len = len(permission_bitmask)
         for codename in permissions:
             bitmask_idx = permission_codename_bitmap.get(codename)
-            if bitmask_idx is None or not (0 <= bitmask_idx < permission_bitmask_len):
+            if bitmask_idx is None or not 0 <= bitmask_idx < permission_bitmask_len:
                 raise AuthException(f'Bad permission bitmask `{permission_bitmask}`', ErrorCode.BAD_BITMASK)
 
             bit_chat = permission_bitmask[permission_bitmask_len - bitmask_idx - 1]

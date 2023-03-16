@@ -1,4 +1,4 @@
-.PHONY: format lint test
+.PHONY: format lint test clean build
 
 all: format lint
 
@@ -21,3 +21,14 @@ test_flask:
 
 test_versions:
 	poetry run tox
+
+clean:
+	@if [ -d "build" ]; then \
+		rm -rf build; \
+	fi
+	@if [ -d "dist" ]; then \
+		rm -rf dist; \
+	fi
+
+build: clean
+	poetry build

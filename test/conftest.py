@@ -8,10 +8,10 @@ from web_auth import Config
 
 @pytest.fixture(scope='session')
 def fastapi_global_context():
-    from web_auth.web_bridge.fastapi import FastapiBridge
+    from web_auth.bridges.fastapi import FastapiBridge
 
     global_decorator = Config.configure(
-        web_bridge_class=FastapiBridge,
+        bridge_class=FastapiBridge,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )
     yield global_decorator
@@ -19,10 +19,10 @@ def fastapi_global_context():
 
 @pytest.fixture(scope='session')
 def flask_global_context():
-    from web_auth.web_bridge.flask import FlaskBridge
+    from web_auth.bridges.flask import FlaskBridge
 
     global_decorator = Config.configure(
-        web_bridge_class=FlaskBridge,
+        bridge_class=FlaskBridge,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )
     yield global_decorator

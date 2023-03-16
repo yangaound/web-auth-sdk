@@ -6,10 +6,10 @@ from web_auth import AuthException, Config, Consumer, ErrorCode
 
 @pytest.fixture(scope='module')
 def flask_server(jwt_payload):
-    from web_auth.web_bridge.flask import FlaskBridge
+    from web_auth.bridges.flask import FlaskBridge
 
     context = Config.build_context(
-        web_bridge_class=FlaskBridge,
+        bridge_class=FlaskBridge,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )
 
@@ -21,7 +21,7 @@ def flask_server(jwt_payload):
     )
 
     @app.route('/tickets')
-    @context(['view_ticket'])
+    @context.permissions(['view_ticket'])
     def get_tickets():
         return jsonify('Hello!')
 

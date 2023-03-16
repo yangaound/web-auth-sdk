@@ -8,23 +8,23 @@ from web_auth import AuthException, Config, Consumer, ErrorCode
 
 @pytest.fixture(scope='module')
 def fastapi_server(jwt_payload):
-    from web_auth.web_bridge.fastapi import FastapiBridge
+    from web_auth.bridges.fastapi import FastapiBridge
 
     context = Config.build_context(
-        web_bridge_class=FastapiBridge,
+        bridge_class=FastapiBridge,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )
 
     fast_app = FastAPI()
 
     @fast_app.get('/tickets')
-    @context(['view_ticket'])
+    @context.permissions(['view_ticket'])
     async def get_tickets():
         return 'Hello!'
 
     @fast_app.post('/delete-ticket-type')
     @context('delete_tickettype')
-    async def adjudicate_claim():
+    async def delete_ticket_type():
         return 'Hello!'
 
     @fast_app.post('/inject-reqeust')

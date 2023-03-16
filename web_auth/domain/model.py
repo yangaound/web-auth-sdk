@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from pydantic import BaseModel
+
 
 @dataclass
 class PermissionModel:
@@ -10,7 +12,12 @@ class PermissionModel:
     service: Optional[str]
 
 
-class Consumer(dict):
+class Consumer(BaseModel):
     """authenticated client data structure that can be used by developers as a parameter in view functions to retrieve
     consumer information.
     """
+
+    user_id: int
+    permission_bitmask: str
+    iat: int
+    exp: int

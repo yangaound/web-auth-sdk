@@ -55,12 +55,12 @@ class WebBridge(abc.ABC):
         """
 
         self.context.logger.debug(f'Bridging request `{request}` require permissions `{permissions}`')
-        consumer_info, consumer_info_type = self.authenticate(request)
-        self.context.logger.debug(f'Authenticated consumer `{consumer_info}` with scheme `{consumer_info_type}`')
+        consumer, consumer_auth_type = self.authenticate(request)
+        self.context.logger.debug(f'Authenticated consumer `{consumer}` with scheme `{consumer_auth_type}`')
         authorization: Authorization = self.get_authorization()
-        authorization.authorize((consumer_info, consumer_info_type), permissions, aggregation_type)
+        authorization.authorize((consumer, consumer_auth_type), permissions, aggregation_type)
         self.context.logger.debug('The consumer required permissions are granted')
-        return consumer_info
+        return consumer
 
     def get_authorization(self) -> Authorization:
         """Factory method. Create an authorization that determines if a user has the required permissions

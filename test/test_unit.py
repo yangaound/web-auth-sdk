@@ -8,15 +8,15 @@ from web_auth import AuthException, Config, JsonFileStorage, JWTAuthorization, P
 
 def test_access_control():
     context = Config.build_context(
-        web_bridge_class=FakeWebBridge,
+        bridge_class=FakeWebBridge,
         storage_class=JsonFileStorage,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )
 
     reqeust = pathlib.Path('usr/etc/JWT.txt')
-    context.web_bridge.access_control(reqeust, permissions={'view_order'})
+    context.bridge.access_control(reqeust, permissions={'view_order'})
     with pytest.raises(AuthException, match='Permission denied'):
-        context.web_bridge.access_control(reqeust, permissions={'delete_tickettype'})
+        context.bridge.access_control(reqeust, permissions={'delete_tickettype'})
 
 
 def test_jwt_decoding(jwt_token, bearer_jwt_token, jwt_payload):
@@ -38,7 +38,7 @@ def test_bitmask_decoding():
 
 def test_check_bitmask_permissions():
     context = Config.build_context(
-        web_bridge_class=FakeWebBridge, storage_class=JsonFileStorage, storage_params=Config.DEFAULT_STORAGE_PARAMS
+        bridge_class=FakeWebBridge, storage_class=JsonFileStorage, storage_params=Config.DEFAULT_STORAGE_PARAMS
     )
     permission_bitmask = '111111111111111111111111111111110111111101111111'
 
