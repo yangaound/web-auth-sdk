@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "web-auth-sdk"
-version = "0.1.2"
+version = "0.1.3"
 description = "authorization SDK used to build protected Web APIs"
 authors = []
 readme = "README.md"
