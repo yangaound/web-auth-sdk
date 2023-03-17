@@ -25,7 +25,7 @@ def flask_server(jwt_payload):
     def get_tickets():
         return jsonify('Hello!')
 
-    @app.route('/delete-ticket-type', methods=['POST'])
+    @app.route('/delete-ticket-type', methods=['DELETE'])
     @context('delete_tickettype')
     def delete_ticket_type():
         return jsonify('Hello!')
@@ -70,7 +70,7 @@ def test_flask_app(flask_client, bearer_jwt_token):
     assert response.status_code == 403
     assert response.json['code'] == ErrorCode.UNAUTHORIZED
 
-    response = flask_client.post('/delete-ticket-type', headers={'AUTHORIZATION': bearer_jwt_token})
+    response = flask_client.delete('/delete-ticket-type', headers={'AUTHORIZATION': bearer_jwt_token})
     assert response.status_code == 403
     assert response.json['code'] == ErrorCode.PERMISSION_DENIED
     assert response.json['message'] == 'Permission denied'

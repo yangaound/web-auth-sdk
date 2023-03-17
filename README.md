@@ -1,19 +1,25 @@
 # web-auth-sdk
+<img src="https://img.shields.io/github/actions/workflow/status/yangaound/web-auth-sdk/makefile-ci.yml?branch=main" /><img src="https://img.shields.io/pypi/v/web-auth-sdk" />
+<img src="https://img.shields.io/badge/license-MIT-green.svg" />
+<img src="https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg" />
 
-The web-auth-sdk is an authorization SDK used to build protected Web APIs.
+The web-auth-sdk is an authorization SDK that is used to build protected Web APIs.
 It provides the ability to intercept incoming requests and inject custom logic for authentication and authorization
 before the request reaches the view function.
 
-Clients should authenticate by passing credentials or authorizations. For example, a JWT key can be used as follows:
+In addition, it supports Google OAuth2 for logging in and session logging in.
+
+To access protected APIs, clients should authenticate by passing credentials or authorizations. For example, a JWT key can be used as follows:
    ```shell
-     curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
-     curl 'http://api.example.com/resources?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
-     curl 'http://api.example.com/resources' --cookie 'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
+     curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
+     curl 'http://api.example.com/resources?access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
+     curl 'http://api.example.com/resources' --cookie 'access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
    ```
 
 ## Requirements
 - Python 3.8+
-- FastAPI 0.80+ (recommended)
+- FastAPI 0.80+ (optional)
+- Django 4.0+ (optional)
 - Flask 2.0+ (optional)
 
 ## Installation
@@ -37,7 +43,7 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     ]
     ```
 
-2. How to encode permissions?
+2. How to grant permissions?
 
    Permissions are encoded using a bitmask of length n that is a multiple of 24.
    Each permission is represented by a 1 on the corresponding `bitmask_idx`-th position in the bitmask, indicating that
@@ -45,12 +51,24 @@ Clients should authenticate by passing credentials or authorizations. For exampl
 
 
 3. Base64-encoded the bitmask
-![](usr/share/img/PermissionBitmask.png)
+    
+    | Bitmask                                           | Base64-encoded |
+    |----------------|----------------|
+    | 111111111111111111111111111111110111111101111111  | /////39/       |
 
-
-4. Encoded/Decoded JWT
-![](usr/share/img/JWT.png)
-
+4. Decoded/Encoded JWT
+    ```json
+    {
+      "user_id": 1,
+      "permission_bitmask": "/////39/",
+      "iat": 1678798980,
+      "exp": 1678800187
+    }
+    ```
+    ```json
+    eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG1hc2siOiIvLy8vLzM5LyIsImlhdCI6MTY3ODc5ODk4MCwiZXhwIjoxNjc4ODAwMTg3fQ
+    ```
+   
 
 ## Development
 - ### FastAPI
@@ -66,6 +84,22 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     async def list_tickets() -> list[object]: 
         pass
     ```
+  
+- ### Django
+
+    ```python
+    import web_auth
+    from web_auth.django import DjangoBridge
+    
+  
+    web_auth.configure(bridge_class=DjangoBridge)
+    
+    @web_auth.permissions('view_ticket')
+    def list_tickets(request) -> list[object]: 
+        pass
+  
+    urlpatterns = [django.urls.path('list-tickets', list_tickets)]
+    ```
 
 - ### Flask
 
@@ -74,11 +108,9 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     from web_auth.flask import FlaskBridge
     
   
-    web_auth.configure(
-        bridge_class=FlaskBridge,
-    )
+    web_auth.configure(bridge_class=FlaskBridge)
     
-    @blueprint.route('/tickets', methods=['GET'])
+    @flask.route('/tickets', methods=['GET'])
     @web_auth.permissions('view_ticket')
     def list_tickets() -> list[object]: 
         pass
@@ -211,3 +243,26 @@ Clients should authenticate by passing credentials or authorizations. For exampl
     def get_tickets() -> list[object]:
         pass
     ```
+  
+- ### Oauth2 client
+    1. Install apps to `settings.py`
+    ```python
+    INSTALLED_APPS = [
+        'web_auth.django'
+    ]
+    ```
+
+    2. Register url to `urls.py`
+    ```python
+    urlpatterns = [
+        django.urls.path('', django.urls.include('web_auth.django.urls')),
+    ]
+    ```
+  
+    3. Login with Google
+    - http://api.example.com/google/login
+    - http://api.example.com/google/auth
+  
+    4. Session Login
+    - http://api.example.com/session/csrftoken
+    - http://api.example.com/session/login
