@@ -11,10 +11,15 @@ class Authorization(abc.ABC):
         self.context = context
 
     @abc.abstractmethod
-    def authorize(self, consumer_info: tuple[Consumer, str], permissions, aggregation_type):
-        """Checks whether a user has the necessary permissions to access a protected resource.
+    def authorize(
+        self,
+        consumer: Consumer,
+        permissions: set[str],
+        aggregation_type: PermissionAggregationTypeEnum,
+    ):
+        """Checks whether the `consumer` has the `permissions` to access a protected resource.
 
-        :param consumer_info: the value of returning from Authentication
+        :param consumer: the consumer of returning from Authentication
         :param permissions: the permissions the users required
         :param aggregation_type: aggregate method of applying permissions; all permissions are needed or just any.
         """
@@ -28,8 +33,12 @@ class JWTAuthorization(Authorization):
     appropriate error code defined in `ErrorCode`.
     """
 
-    def authorize(self, consumer_info: tuple[Consumer, str], permissions, aggregation_type):
-        consumer, _ = consumer_info
+    def authorize(
+        self,
+        consumer: Consumer,
+        permissions: set[str],
+        aggregation_type: PermissionAggregationTypeEnum,
+    ):
         permission_bitmask = self.convert_base64encoded_to_bitmask(consumer.permission_bitmask)
         return self.check_permissions(
             permissions,

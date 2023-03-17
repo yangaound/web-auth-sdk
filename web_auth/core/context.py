@@ -7,7 +7,7 @@ from .storage import Storage
 
 
 class Context:
-    """data structure for storing an access control flow dependency information."""
+    """Data structure for storing an access control mechanism dependency information."""
 
     storage: Storage
     storage_params: dict[str, Any]
@@ -28,7 +28,7 @@ class Context:
         return validated_permissions
 
     def __call__(
-        self, required_permissions: Union[str, Iterable[str]], aggregation_type=PermissionAggregationTypeEnum.ALL
+        self, required_permissions: Union[str, Iterable[str]] = (), aggregation_type=PermissionAggregationTypeEnum.ALL
     ) -> callable:
         """Create a callable, which marks a view function (endpoint) require the `permissions` to perform.
 

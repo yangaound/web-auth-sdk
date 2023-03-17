@@ -1,6 +1,6 @@
 import logging
 from importlib import import_module
-from typing import Optional, Union
+from typing import Optional, Type, Union
 
 from .core.bridge import WebBridge
 from .core.context import Context
@@ -9,12 +9,12 @@ from .core.storage import Storage
 
 class Config:
     DEFAULT_CONTEXT_CLASS = 'web_auth.core.context.Context'
-    DEFAULT_BRIDGE_CLASS = 'web_auth.fastapi.FastapiBridge'
-    DEFAULT_STORAGE_CLASS = 'web_auth.storage.JsonFileStorage'
+    DEFAULT_STORAGE_CLASS = 'web_auth.core.storage.JsonFileStorage'
     DEFAULT_STORAGE_PARAMS = {
         'permission_file_path': 'usr/etc/permissions.json',
         'ttl': 60,
     }
+    DEFAULT_BRIDGE_CLASS = 'web_auth.fastapi.FastapiBridge'
 
     _globals_context: Optional[Context] = None
 
@@ -38,9 +38,9 @@ class Config:
     def configure(
         cls,
         logger_name: Optional[str] = None,
-        context_class: Union[Context, str] = None,
-        bridge_class: Union[WebBridge, str] = None,
-        storage_class: Union[Storage, str] = None,
+        context_class: Union[Type[Context], str] = None,
+        bridge_class: Union[Type[WebBridge], str] = None,
+        storage_class: Union[Type[Storage], str] = None,
         storage_params: dict[str, any] = None,
         **kwargs,
     ) -> Context:
@@ -62,9 +62,9 @@ class Config:
     def build_context(
         cls,
         logger_name: Optional[str] = None,
-        context_class: Union[Context, str] = None,  # assumed to use `cls.DEFAULT_CONTEXT_CLASS`
-        bridge_class: Union[WebBridge, str] = None,  # assumed use `cls.DEFAULT_BRIDGE_CLASS`
-        storage_class: Union[Storage, str] = None,  # assumed to use `cls.DEFAULT_STORAGE_CLASS`
+        context_class: Union[Type[Context], str] = None,  # assumed to use `cls.DEFAULT_CONTEXT_CLASS`
+        bridge_class: Union[Type[WebBridge], str] = None,  # assumed use `cls.DEFAULT_BRIDGE_CLASS`
+        storage_class: Union[Type[Storage], str] = None,  # assumed to use `cls.DEFAULT_STORAGE_CLASS`
         storage_params: dict[str, any] = None,  # assumed to use `cls.DEFAULT_STORAGE_PARAMS`
         **kwargs,
     ) -> Context:
@@ -108,7 +108,7 @@ class Config:
         context.storage_params = (
             storage_params or (globals_context and globals_context.storage_params) or cls.DEFAULT_STORAGE_PARAMS
         )
-        context.storage = _class(**context.storage_params)
+        context.storage = _class(context=context, **context.storage_params)
 
         # Customize init
         context.kwargs = kwargs

@@ -17,7 +17,7 @@ class FakeWebBridge(WebBridge):
         def wrapper(request: Path):
             return self.access_control(request, permissions, aggregation_type)
 
-        self.context.logger.debug(f'Wrapped view-func `{wrapper}`, which require permissions `{permissions}`')
+        self.context.logger.debug(f'Wrapped view {wrapper}, which require permissions `{permissions}`')
         return wrapper
 
     def authenticate(self, request: Path) -> tuple[Consumer, str]:

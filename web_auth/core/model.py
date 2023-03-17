@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from pydantic import BaseModel
+import pydantic
 
 
 @dataclass
@@ -12,7 +12,7 @@ class PermissionModel:
     service: Optional[str]
 
 
-class Consumer(BaseModel):
+class Consumer(pydantic.BaseModel):
     """authenticated client data structure that can be used by developers as a parameter in view functions to retrieve
     consumer information.
     """

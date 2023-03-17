@@ -6,8 +6,8 @@ from .core.bridge import WebBridge
 from .core.context import Context
 from .core.enum import ErrorCode, PermissionAggregationTypeEnum
 from .core.exception import AuthException
-from .core.model import Consumer
-from .core.storage import JsonFileStorage
+from .core.model import Consumer, PermissionModel
+from .core.storage import JsonFileStorage, Storage
 
 _ = (
     Config,
@@ -15,7 +15,9 @@ _ = (
     Context,
     AuthException,
     Consumer,
+    PermissionModel,
     ErrorCode,
+    Storage,
     JsonFileStorage,
     Authorization,
     JWTAuthorization,
@@ -26,7 +28,7 @@ build_context = Config.build_context
 
 
 def permissions(
-    required_permissions: Union[str, Iterable[str]],
+    required_permissions: Union[str, Iterable[str]] = (),
     aggregation_type=PermissionAggregationTypeEnum.ALL,
 ) -> callable:
     """
