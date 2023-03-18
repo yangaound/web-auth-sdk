@@ -14,10 +14,13 @@ test:
 	poetry run pytest -s
 
 test_fastapi:
-	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/flask
+	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/flask --ignore=test/django --cov=test/fastapi
 
 test_flask:
-	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi
+	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/django --cov=test/flask
+
+test_django:
+	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/flask --cov=test/django
 
 test_versions:
 	poetry run tox

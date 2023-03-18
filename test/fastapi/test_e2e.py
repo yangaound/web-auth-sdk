@@ -22,7 +22,7 @@ def fastapi_server(jwt_payload):
     async def get_tickets():
         return 'Hello!'
 
-    @fast_app.post('/delete-ticket-type')
+    @fast_app.delete('/delete-ticket-type')
     @context('delete_tickettype')
     async def delete_ticket_type():
         return 'Hello!'
@@ -71,7 +71,7 @@ async def test_fastapi_app(client, bearer_jwt_token):
     assert response.status_code == 403
     assert response.json()['code'] == ErrorCode.UNAUTHORIZED
 
-    response = client.post('/delete-ticket-type', headers={'AUTHORIZATION': bearer_jwt_token})
+    response = client.delete('/delete-ticket-type', headers={'AUTHORIZATION': bearer_jwt_token})
     assert response.status_code == 403
     assert response.json()['code'] == ErrorCode.PERMISSION_DENIED
     assert response.json()['message'] == 'Permission denied'
