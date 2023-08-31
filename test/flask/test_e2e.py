@@ -8,7 +8,7 @@ from web_auth import AuthException, Config, Consumer, ErrorCode
 def flask_server(jwt_payload):
     from web_auth.flask import FlaskBridge
 
-    context = Config.build_context(
+    context = Config.make_context(
         bridge_class=FlaskBridge,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )

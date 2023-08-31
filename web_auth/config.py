@@ -47,7 +47,7 @@ class Config:
         """Do global configuration context. Do nothing if it's already existed."""
 
         if not cls._globals_context:
-            cls._globals_context: Context = cls.build_context(
+            cls._globals_context: Context = cls.make_context(
                 context_class=context_class,
                 logger_name=logger_name,
                 bridge_class=bridge_class,
@@ -59,7 +59,7 @@ class Config:
         return cls._globals_context
 
     @classmethod
-    def build_context(
+    def make_context(
         cls,
         logger_name: Optional[str] = None,
         context_class: Union[Type[Context], str] = None,  # assumed to use `cls.DEFAULT_CONTEXT_CLASS`
@@ -121,8 +121,5 @@ class Config:
 
         _class = cls._import_cls_string(bridge_class) if isinstance(bridge_class, str) else bridge_class
         context.bridge = _class(context=context)
-
-        if not globals_context:
-            cls._globals_context = context
 
         return context

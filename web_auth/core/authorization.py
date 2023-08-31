@@ -3,7 +3,7 @@ import base64
 
 from .enum import ErrorCode, PermissionAggregationTypeEnum
 from .exception import AuthException
-from .model import Consumer, PermissionModel
+from .model import Consumer, JWTConsumer, PermissionModel
 
 
 class Authorization(abc.ABC):
@@ -35,7 +35,7 @@ class JWTAuthorization(Authorization):
 
     def authorize(
         self,
-        consumer: Consumer,
+        consumer: JWTConsumer,
         permissions: set[str],
         aggregation_type: PermissionAggregationTypeEnum,
     ):

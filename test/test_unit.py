@@ -1,14 +1,13 @@
 import pathlib
-from test._fake_web_bridge import FakeWebBridge
 
 import pytest
 
 from web_auth import AuthException, Config, JsonFileStorage, JWTAuthorization, PermissionAggregationTypeEnum, WebBridge
 
 
-def test_access_control():
-    context = Config.build_context(
-        bridge_class=FakeWebBridge,
+def test_access_control(fake_web_bridge):
+    context = Config.make_context(
+        bridge_class=fake_web_bridge,
         storage_class=JsonFileStorage,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
     )
@@ -36,9 +35,9 @@ def test_bitmask_decoding():
         JWTAuthorization.convert_base64encoded_to_bitmask(base64encoded_bitmask)
 
 
-def test_check_bitmask_permissions():
-    context = Config.build_context(
-        bridge_class=FakeWebBridge, storage_class=JsonFileStorage, storage_params=Config.DEFAULT_STORAGE_PARAMS
+def test_check_bitmask_permissions(fake_web_bridge):
+    context = Config.make_context(
+        bridge_class=fake_web_bridge, storage_class=JsonFileStorage, storage_params=Config.DEFAULT_STORAGE_PARAMS
     )
     permission_bitmask = '111111111111111111111111111111110111111101111111'
 

@@ -12,10 +12,19 @@ class PermissionModel:
     service: Optional[str]
 
 
+class ErrorMessage(pydantic.BaseModel):
+    code: str
+    message: str
+
+
 class Consumer(pydantic.BaseModel):
-    """authenticated client data structure that can be used by developers as a parameter in view functions to retrieve
-    consumer information.
+    """Authenticated client base class that developers can derive its attribute and declare it as a parameter
+    in view functions to retrieve consumer information.
     """
+
+
+class JWTConsumer(Consumer):
+    """Authenticated client data structure by JWT"""
 
     user_id: int
     permission_bitmask: str

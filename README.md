@@ -9,16 +9,20 @@ before the request reaches the view function.
 
 In addition, it supports Google OAuth2 for logging in and session logging in.
 
-To access protected APIs, clients should authenticate by passing credentials or authorizations. For example, a JWT key can be used as follows:
+To access protected APIs, clients should authenticate by passing authorizations. For example, a JWT key can be used as follows:
    ```shell
      curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
      curl 'http://api.example.com/resources?access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
      curl 'http://api.example.com/resources' --cookie 'access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
    ```
+>  **_TIP:_**
+> When utilizing FastAPI, click the lock symbol on Swagger UI to include your JWT.
+> Run `make startup` for a quick preview.
+![img.png](usr/share/img/IncludeJWT.png)
 
 ## Requirements
 - Python 3.8+
-- FastAPI 0.80+ (optional)
+- FastAPI 0.80+ (recommended)
 - Django 4.0+ (optional)
 - Flask 2.0+ (optional)
 
@@ -26,7 +30,11 @@ To access protected APIs, clients should authenticate by passing credentials or 
    ```shell
    pip install web-auth-sdk
    ```
-
+or
+   ```shell
+   git clone https://github.com/yangaound/web-auth-sdk
+   cd web-auth-sdk && poetry install
+   ```
 
 ## Permission Representation
 1. Permission list, located at `usr/etc/permissions.json` file:
@@ -52,9 +60,9 @@ To access protected APIs, clients should authenticate by passing credentials or 
 
 3. Base64-encoded the bitmask
     
-    | Bitmask                                           | Base64-encoded |
-    |----------------|----------------|
-    | 111111111111111111111111111111110111111101111111  | /////39/       |
+    | Bitmask                                          | Base64-encoded |
+    |--------------------------------------------------|----------------|
+    | 111111111111111111111111111111110111111101111111 | /////39/       |
 
 4. Decoded/Encoded JWT
     ```json
@@ -65,7 +73,7 @@ To access protected APIs, clients should authenticate by passing credentials or 
       "exp": 1678800187
     }
     ```
-    ```json
+    ```text
     eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG1hc2siOiIvLy8vLzM5LyIsImlhdCI6MTY3ODc5ODk4MCwiZXhwIjoxNjc4ODAwMTg3fQ
     ```
    
@@ -76,13 +84,11 @@ To access protected APIs, clients should authenticate by passing credentials or 
     ```python
     import web_auth
     
-  
-    web_auth.configure()
-    
+      
     @fastapi.get('/tickets')
     @web_auth.permissions('view_ticket') # Iterable[str] are acceptable
-    async def list_tickets() -> list[object]: 
-        pass
+    async def list_tickets() -> list: 
+        return []
     ```
   
 - ### Django
@@ -95,7 +101,7 @@ To access protected APIs, clients should authenticate by passing credentials or 
     web_auth.configure(bridge_class=DjangoBridge)
     
     @web_auth.permissions('view_ticket')
-    def list_tickets(request) -> list[object]: 
+    def list_tickets(request): 
         pass
   
     urlpatterns = [django.urls.path('list-tickets', list_tickets)]
@@ -112,8 +118,8 @@ To access protected APIs, clients should authenticate by passing credentials or 
     
     @flask.route('/tickets', methods=['GET'])
     @web_auth.permissions('view_ticket')
-    def list_tickets() -> list[object]: 
-        pass
+    def list_tickets() -> list: 
+        return []
     ```
 
 - ### Use instanced context
@@ -122,12 +128,12 @@ To access protected APIs, clients should authenticate by passing credentials or 
     import web_auth
     
   
-    context = web_auth.build_context()  
+    context = web_auth.make_context()  
     
     @fastapi.get('/tickets')
     @context.permissions('view_ticket')
-    async def list_tickets() -> list[object]: 
-        pass
+    async def list_tickets() -> list: 
+        return []
     ```
 
 - ### Implement access control & retrieve the consumer info
@@ -137,19 +143,18 @@ To access protected APIs, clients should authenticate by passing credentials or 
     import web_auth
     
   
-    context = web_auth.build_context()
+    context = web_auth.make_context()
     
     @fastapi.get('/profile')
     @context.permissions()
-    def get_profile(request: fastapi.Request, consumer: web_auth.Consumer) -> web_auth.Consumer:
+    def get_profile(request: fastapi.Request, consumer: web_auth.Consumer) -> web_auth.JWTConsumer:
         # raise `web_auth.AuthException` if the consumer does not have permission
         context.bridge.access_control(
             request=request, 
             permissions={'view_ticket'},
             aggregation_type=web_auth.PermissionAggregationTypeEnum.ALL,
         )
-        return consumer
-
+        return web_auth.JWTConsumer(**consumer.dict())
     ```
   
 - ### Customization
@@ -160,7 +165,7 @@ To access protected APIs, clients should authenticate by passing credentials or 
     import fastapi
     import requests
   
-    from web_auth import build_context, Storage, PermissionModel, Context
+    from web_auth import make_context, Storage, PermissionModel, Context
   
   
     class RESTStorage(Storage):
@@ -171,7 +176,7 @@ To access protected APIs, clients should authenticate by passing credentials or 
         def _load_permissions(self) -> list[PermissionModel]:
             return [PermissionModel(**r) for r in requests.get(self.url).json()]
     
-    my_context = build_context(
+    my_context = make_context(
         storage_class=RESTStorage,
         storage_params={'ttl': 60, 'url': 'http://api.example.com/permissions?format=json'},
     )
@@ -185,23 +190,20 @@ To access protected APIs, clients should authenticate by passing credentials or 
     2. Authentication
     ```python
     import fastapi
-    import pydantic
   
-    from web_auth import build_context, Config
+    from web_auth import make_context, Config, Consumer
     from web_auth.fastapi import FastapiBridge
   
   
-    class MyConsumer(pydantic.BaseModel):
+    class MyConsumer(Consumer):
         user_id: int
   
-    class MyFastapiBridge(FastapiBridge):
-        consumer_class = MyConsumer
-  
+    class MyFastapiBridge(FastapiBridge):  
         def authenticate(self, request: fastapi.Request) -> tuple[MyConsumer, str]:
             # your authenticate logic
             return MyConsumer(user_id=1), 'JWT'
     
-    my_context = build_context(
+    my_context = make_context(
         bridge_class=MyFastapiBridge,
         storage_class=Config.DEFAULT_STORAGE_CLASS,
         storage_params=Config.DEFAULT_STORAGE_PARAMS,
@@ -209,7 +211,7 @@ To access protected APIs, clients should authenticate by passing credentials or 
   
     @fastapi.get('/profile')
     @my_context([])
-    def get_profile(consumer: MyConsumer) -> MyConsumer:
+    def get_profile(consumer: Consumer) -> MyConsumer:
         return consumer
     ```
   
@@ -217,14 +219,14 @@ To access protected APIs, clients should authenticate by passing credentials or 
     ```python
     import fastapi
   
-    from web_auth import build_context, Authorization, Consumer, PermissionAggregationTypeEnum
+    from web_auth import make_context, Authorization, JWTConsumer, PermissionAggregationTypeEnum
     from web_auth.fastapi import FastapiBridge 
   
   
     class MyAuthorization(Authorization):
         def authorize(
             self,
-            consumer: Consumer,
+            consumer: JWTConsumer,
             permissions: set[str],
             aggregation_type: PermissionAggregationTypeEnum,
         ):
@@ -234,7 +236,7 @@ To access protected APIs, clients should authenticate by passing credentials or 
     class MyFastapiBridge(FastapiBridge):
         authorization_class = MyAuthorization
     
-    my_context = build_context(
+    my_context = make_context(
         bridge_class=MyFastapiBridge,
     )
     
