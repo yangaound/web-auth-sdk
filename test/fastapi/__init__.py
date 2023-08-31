@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from web_auth import AuthException, Consumer, ErrorMessage, JWTConsumer, permissions
+from web_auth import AuthException, Consumer, ErrorMessageModel, JWTConsumer, permissions
 
 app = FastAPI()
 
@@ -12,7 +12,7 @@ app = FastAPI()
     response_model=JWTConsumer,
     responses={
         HTTP_401_UNAUTHORIZED: {
-            'model': ErrorMessage,
+            'model': ErrorMessageModel,
             'description': 'Unauthorized',
             'content': {'application/json': {'example': {'code': '4010', 'message': 'Unauthorized'}}},
         }
@@ -25,4 +25,4 @@ async def retrieve_consumer(consumer: Consumer) -> JWTConsumer:
 
 @app.exception_handler(AuthException)
 async def exception_handler(_: Request, exception: AuthException):
-    return JSONResponse(status_code=401, content=ErrorMessage(code=exception.code, message=str(exception)).dict())
+    return JSONResponse(status_code=401, content=ErrorMessageModel(code=exception.code, message=str(exception)).dict())
