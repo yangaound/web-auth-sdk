@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "web-auth-sdk"
-version = "0.2.0"
+version = "1.0.0"
 description = "authorization SDK used to build protected Web APIs"
 authors = []
 readme = "README.md"
@@ -47,6 +47,7 @@ pytest-asyncio = "^0.19.0"
 tox = "^3.25.1"
 pytest-django = "^4.5.2"
 pytest-cov = "^4.0.0"
+uvicorn = "^0.23.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

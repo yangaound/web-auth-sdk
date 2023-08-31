@@ -35,6 +35,7 @@ class Context:
         :param required_permissions: a string or a collection of strings representing the permissions required by
             the view function.
         :param aggregation_type: optional parameter that specifies whether all permissions are required or just any.
+        :return: a callable(view-func decorator) object created by the `WebBridge`.
         """
 
         permissions = self._validate_required_permissions(required_permissions)

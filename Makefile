@@ -10,6 +10,9 @@ format:
 lint:
 	poetry run pylint -v --load-plugins pylint_quotes ./web_auth ./test
 
+startup:
+	poetry run uvicorn test.fastapi:app --reload
+
 test:
 	poetry run pytest -s
 

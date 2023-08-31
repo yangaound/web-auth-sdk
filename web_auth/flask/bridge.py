@@ -2,7 +2,6 @@ from functools import wraps
 from inspect import signature
 from typing import Type
 
-import pydantic
 from flask import Request
 from flask import request as flask_request
 
@@ -12,6 +11,7 @@ from web_auth import (
     Context,
     ErrorCode,
     JWTAuthorization,
+    JWTConsumer,
     PermissionAggregationTypeEnum,
     WebBridge,
 )
@@ -34,9 +34,14 @@ class FlaskBridge(WebBridge):
         def decorator(func):
             func_signature = signature(func)
 
-            consumer_class: Type[pydantic.BaseModel] = self.get_consumer_class()
+            consumer_class: Type[Consumer] = self.get_consumer_class()
             consumer_parma_name = next(
-                (k for k, v in func_signature.parameters.items() if v.annotation is consumer_class), None
+                (
+                    k
+                    for k, v in func_signature.parameters.items()
+                    if issubclass(v.annotation, Consumer) or v.annotation is consumer_class
+                ),
+                None,
             )
             if consumer_parma_name:
                 self.context.logger.debug(
@@ -81,4 +86,4 @@ class FlaskBridge(WebBridge):
             raise AuthException(message='Unauthorized', code=ErrorCode.UNAUTHORIZED)
 
         jwt_payload = self.decode_jwt_token(_token)
-        return Consumer(**jwt_payload), 'JWT'
+        return JWTConsumer(**jwt_payload), 'JWT'

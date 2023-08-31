@@ -1,9 +1,9 @@
 from django.http.response import JsonResponse
 
-from web_auth import AuthException, build_context
+from web_auth import AuthException, make_context
 from web_auth.django import DjangoBridge
 
-context = build_context(
+context = make_context(
     bridge_class=DjangoBridge,
 )
 
