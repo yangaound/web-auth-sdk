@@ -12,7 +12,7 @@ class PermissionModel:
     service: Optional[str]
 
 
-class ErrorMessage(pydantic.BaseModel):
+class ErrorMessageModel(pydantic.BaseModel):
     code: str
     message: str
 

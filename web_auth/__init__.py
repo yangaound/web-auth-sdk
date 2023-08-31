@@ -6,7 +6,7 @@ from .core.bridge import WebBridge
 from .core.context import Context
 from .core.enum import ErrorCode, PermissionAggregationTypeEnum
 from .core.exception import AuthException
-from .core.model import Consumer, ErrorMessage, JWTConsumer, PermissionModel
+from .core.model import Consumer, ErrorMessageModel, JWTConsumer, PermissionModel
 from .core.storage import JsonFileStorage, Storage
 
 _ = (
@@ -17,8 +17,8 @@ _ = (
     Consumer,
     JWTConsumer,
     PermissionModel,
+    ErrorMessageModel,
     ErrorCode,
-    ErrorMessage,
     Storage,
     JsonFileStorage,
     Authorization,
