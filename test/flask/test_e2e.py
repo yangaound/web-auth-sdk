@@ -33,7 +33,7 @@ def flask_server(jwt_payload):
     @app.route('/inject-consumer-info', methods=['POST'])
     @context([])
     def inject_consumer_info(consumer: Consumer):
-        assert consumer == jwt_payload
+        assert consumer.user.user_id == jwt_payload['user_id']
         return jsonify('Hello!')
 
     @app.errorhandler(AuthException)

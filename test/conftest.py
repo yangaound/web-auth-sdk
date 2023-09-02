@@ -4,7 +4,7 @@ from pathlib import Path
 import jwt
 import pytest
 
-from web_auth import Consumer, Context, JWTAuthorization, JWTConsumer, PermissionAggregationTypeEnum, WebBridge
+from web_auth import Consumer, Context, JWTUser, PermissionAggregationTypeEnum, WebBridge
 
 
 @pytest.fixture(scope='session')
@@ -30,8 +30,6 @@ def fake_web_bridge():
 
 
 class _FakeWebBridge(WebBridge):
-    authorization_class = JWTAuthorization
-
     def __init__(self, context: Context):
         super().__init__(context)
 
@@ -46,13 +44,20 @@ class _FakeWebBridge(WebBridge):
         self.context.logger.debug(f'Wrapped view {wrapper}, which require permissions `{permissions}`')
         return wrapper
 
-    def authenticate(self, request: Path) -> tuple[Consumer, str]:
-        """Authenticate requests. return (consumer, consumer_auth_type)
+    def authenticate(self, request: Path) -> Consumer:
+        """Authenticate requests.
 
         :param request: A file path object whose content is a JWT
+        :return: an instance of `Consumer` or its derived class
         """
         with request.open(encoding='utf8') as fp:
             _token = fp.readline().strip()
 
         jwt_payload = self.decode_jwt_token(_token)
-        return JWTConsumer(**jwt_payload), 'JWT'
+        user = JWTUser(**jwt_payload)
+        return Consumer(
+            permission_bitmask=jwt_payload['permission_bitmask'],
+            user=user,
+            auth_scheme='JWT',
+            credential=_token,
+        )

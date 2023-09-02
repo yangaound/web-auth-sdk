@@ -41,7 +41,7 @@ def fastapi_server(jwt_payload):
     @app.post('/inject-consumer-info')
     @context([])
     async def inject_consumer(consumer: Consumer):
-        assert consumer == jwt_payload
+        assert consumer.user.user_id == jwt_payload['user_id']
         return 'Hello!'
 
     yield app
@@ -58,7 +58,7 @@ async def test_fastapi_app(client, bearer_jwt_token):
     assert response.status_code == 200
 
     response = client.get('/use-globals-context', headers={})
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert response.json()['code'] == ErrorCode.UNAUTHORIZED
     assert response.json()['message'] == 'Unauthorized'
 
@@ -66,7 +66,7 @@ async def test_fastapi_app(client, bearer_jwt_token):
     assert response.status_code == 200
 
     response = client.get('/tickets', headers={})
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert response.json()['code'] == ErrorCode.UNAUTHORIZED
     assert response.json()['message'] == 'Unauthorized'
 
@@ -77,10 +77,10 @@ async def test_fastapi_app(client, bearer_jwt_token):
     assert response.status_code == 200
 
     response = client.post('/inject-consumer-info')
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert response.json()['code'] == ErrorCode.UNAUTHORIZED
 
     response = client.delete('/delete-ticket-type', headers={'AUTHORIZATION': bearer_jwt_token})
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert response.json()['code'] == ErrorCode.PERMISSION_DENIED
     assert response.json()['message'] == 'Permission denied'

@@ -1,12 +1,12 @@
 from typing import Iterable, Union
 
 from .config import Config
-from .core.authorization import Authorization, JWTAuthorization
+from .core.authorization import BitmaskAuthorization
 from .core.bridge import WebBridge
 from .core.context import Context
 from .core.enum import ErrorCode, PermissionAggregationTypeEnum
 from .core.exception import AuthException
-from .core.model import Consumer, ErrorMessageModel, JWTConsumer, PermissionModel
+from .core.model import Consumer, ErrorMessageModel, JWTUser, PermissionModel
 from .core.storage import JsonFileStorage, Storage
 
 _ = (
@@ -15,14 +15,13 @@ _ = (
     Context,
     AuthException,
     Consumer,
-    JWTConsumer,
+    JWTUser,
     PermissionModel,
     ErrorMessageModel,
     ErrorCode,
     Storage,
     JsonFileStorage,
-    Authorization,
-    JWTAuthorization,
+    BitmaskAuthorization,
 )
 
 configure = Config.configure
