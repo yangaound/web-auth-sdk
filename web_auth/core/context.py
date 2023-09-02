@@ -32,9 +32,8 @@ class Context:
     ) -> callable:
         """Create a callable, which marks a view function (endpoint) require the `permissions` to perform.
 
-        :param required_permissions: a string or a collection of strings representing the permissions required by
-            the view function.
-        :param aggregation_type: optional parameter that specifies whether all permissions are required or just any.
+        :param required_permissions: The permissions required by the view function.
+        :param aggregation_type: Specifies whether all permissions are required or just any.
         :return: a callable(view-func decorator) object created by the `WebBridge`.
         """
 

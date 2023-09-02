@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import pydantic
 
@@ -43,7 +43,7 @@ class Consumer(object):
     def __init__(
         self,
         permission_bitmask: str,
-        user: Union[JWTUser, ...],
+        user: Union[JWTUser, Any],
         auth_scheme: Optional[str] = None,
         credential: Optional[str] = None,
     ):
