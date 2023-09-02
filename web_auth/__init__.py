@@ -41,7 +41,5 @@ def permissions(
     :param aggregation_type: optional parameter that specifies whether all permissions are required or just any.
     """
 
-    globals_context: Context = Config.get_globals_context() or Config.configure(
-        bridge_class='web_auth.fastapi.bridge.FastapiBridge'
-    )
+    globals_context: Context = Config.get_globals_context() or Config.configure()
     return globals_context(required_permissions, aggregation_type=aggregation_type)  # pylint: disable=not-callable
