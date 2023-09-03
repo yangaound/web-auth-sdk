@@ -14,16 +14,16 @@ startup:
 	poetry run uvicorn test.fastapi:app --reload
 
 test:
-	poetry run pytest -s
+	poetry run pytest -s --cov=web_auth
 
 test_fastapi:
-	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/flask --ignore=test/django --cov=test/fastapi
+	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/flask --ignore=test/django
 
 test_flask:
-	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/django --cov=test/flask
+	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/django
 
 test_django:
-	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/flask --cov=test/django
+	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/flask
 
 test_versions:
 	poetry run tox
