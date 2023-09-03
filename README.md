@@ -136,30 +136,45 @@ or
         return []
     ```
 
-- ### Implement access control & retrieve the consumer info
+  - ### Retrieve the consumer
 
     ```python
     import fastapi
     import web_auth
     
   
-    context = web_auth.make_context()
-    
     @fastapi.get('/profile')
-    @context.permissions()
-    def get_profile(request: fastapi.Request, consumer: web_auth.Consumer) -> dict:
-        # raise `web_auth.AuthException` if the consumer does not have permission
-        context.bridge.access_control(
-            request=request, 
-            permissions={'view_directory'},
-            aggregation_type=web_auth.PermissionAggregationTypeEnum.ALL,
-        )
+    @web_auth.permissions(['view_directory'])
+    def get_profile(consumer: web_auth.Consumer) -> dict:
         return {
             'user': consumer.user.dict(),
             'directories': 'get_directories(consumer.user.user_id)',
         }
     ```
   
+    - ### Implement Fine-Grained Permission Control
+
+    ```python
+    import fastapi
+    import web_auth
+
+
+    @fastapi.post('/some-action')
+    def some_action(request: fastapi.Request):
+        # Create a context with fastapi bridge class
+        context = web_auth.make_context(bridge_class=web_auth.Config.DEFAULT_BRIDGE_CLASS)
+
+        # Authorize access with specific permissions (e.g., 'view_directory')
+        # If this request lacks permission, it will raise `web_auth.AuthException`
+        _: web_auth.Consumer = context.bridge.access_control(
+            request=request, 
+            permissions={'view_directory'},
+            aggregation_type=web_auth.PermissionAggregationTypeEnum.ALL,
+        )
+
+        # Do some action
+    ```
+    
 - ### Customization
     1. Permission Storage
     ```python
@@ -200,11 +215,11 @@ or
   
   
     class AuthenticatedUser(pydantic.BaseModel):
-        account: int
+        account: str
   
 
     class MyFastapiBridge(FastapiBridge):
-        # inject your consumer here if it's not inherited from the `web_auth.Consumer`
+        # Inject your consumer here if it's not inherited from the `web_auth.Consumer`
         consumer_class = Consumer
 
         def authenticate(self, request: fastapi.Request) -> Consumer:
@@ -227,14 +242,14 @@ or
     ```python
     import fastapi
   
-    from web_auth import make_context, BitmaskAuthorization, JWTUser, PermissionAggregationTypeEnum
+    from web_auth import make_context, BitmaskAuthorization, Consumer, PermissionAggregationTypeEnum
     from web_auth.fastapi import FastapiBridge 
   
   
     class MyAuthorization(BitmaskAuthorization):
         def authorize(
             self,
-            consumer: JWTUser,
+            consumer: Consumer,
             permissions: set[str],
             aggregation_type: PermissionAggregationTypeEnum,
         ):
@@ -242,11 +257,11 @@ or
             # Checks whether the `consumer` has the `permissions` in `permission_models`
   
     class MyFastapiBridge(FastapiBridge):
+        # Inject your Authorization implementation here, it's default to BitmaskAuthorization.
         authorization_class = MyAuthorization
     
-    my_context = make_context(
-        bridge_class=MyFastapiBridge,
-    )
+    # Configurate your customization
+    my_context = make_context(bridge_class=MyFastapiBridge)
     
     @fastapi.get('/tickets')
     @my_context(['view_ticket', 'change_ticket'])
