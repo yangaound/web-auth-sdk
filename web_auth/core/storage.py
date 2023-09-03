@@ -39,10 +39,5 @@ class JsonFileStorage(Storage):
         super().__init__(ttl=ttl, context=context)
 
     def _load_permissions(self) -> list[PermissionModel]:
-        return [PermissionModel(**p) for p in self.load_json_file(self.permission_file_path)]
-
-    @staticmethod
-    def load_json_file(path):
-        with open(path, encoding='utf8') as fp:
-            permissions = json.load(fp)
-        return permissions
+        with open(self.permission_file_path, encoding='utf8') as fp:
+            return [PermissionModel(**permission) for permission in json.load(fp)]

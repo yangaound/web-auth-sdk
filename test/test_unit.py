@@ -2,7 +2,14 @@ import pathlib
 
 import pytest
 
-from web_auth import AuthException, Config, JsonFileStorage, JWTAuthorization, PermissionAggregationTypeEnum, WebBridge
+from web_auth import (
+    AuthException,
+    BitmaskAuthorization,
+    Config,
+    JsonFileStorage,
+    PermissionAggregationTypeEnum,
+    WebBridge,
+)
 
 
 def test_access_control(fake_web_bridge):
@@ -28,11 +35,11 @@ def test_bitmask_decoding():
     permission_bitmask = '111111111111111111111111111111110111111101111111'
     base64encoded_bitmask = '/////39/'
 
-    assert permission_bitmask == JWTAuthorization.convert_base64encoded_to_bitmask(base64encoded_bitmask)
+    assert permission_bitmask == BitmaskAuthorization.convert_base64encoded_to_bitmask(base64encoded_bitmask)
 
     base64encoded_bitmask = '//39/'
     with pytest.raises(AuthException, match=f'Bad base64-encoded `{base64encoded_bitmask}`'):
-        JWTAuthorization.convert_base64encoded_to_bitmask(base64encoded_bitmask)
+        BitmaskAuthorization.convert_base64encoded_to_bitmask(base64encoded_bitmask)
 
 
 def test_check_bitmask_permissions(fake_web_bridge):
@@ -41,7 +48,7 @@ def test_check_bitmask_permissions(fake_web_bridge):
     )
     permission_bitmask = '111111111111111111111111111111110111111101111111'
 
-    JWTAuthorization.check_permissions(
+    BitmaskAuthorization.check_permissions(
         permissions={'view_order'},
         permission_bitmask=permission_bitmask,
         permission_models=context.storage.get_permissions(),
@@ -49,7 +56,7 @@ def test_check_bitmask_permissions(fake_web_bridge):
     )
 
     with pytest.raises(AuthException, match='Permission denied'):
-        JWTAuthorization.check_permissions(
+        BitmaskAuthorization.check_permissions(
             permissions={'delete_tickettype'},
             permission_bitmask=permission_bitmask,
             permission_models=context.storage.get_permissions(),

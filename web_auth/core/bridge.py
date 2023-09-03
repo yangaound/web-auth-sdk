@@ -4,7 +4,7 @@ from typing import Type
 
 import jwt
 
-from .authorization import Authorization, JWTAuthorization
+from .authorization import BitmaskAuthorization
 from .enum import ErrorCode, PermissionAggregationTypeEnum
 from .exception import AuthException
 from .model import Consumer
@@ -19,7 +19,7 @@ class WebBridge(abc.ABC):
      2. `authenticate`: Authenticate requests and return (consumer, consumer_auth_type)
     """
 
-    authorization_class: Type[Authorization] = JWTAuthorization
+    authorization_class: Type[BitmaskAuthorization] = BitmaskAuthorization
     consumer_class: Type[Consumer] = Consumer
 
     SEP_BEARER_TOKEN_RE = re.compile(r'\s*[Bb]earer\s+(.+)')
@@ -58,22 +58,18 @@ class WebBridge(abc.ABC):
         """
 
         self.context.logger.debug(f'Bridging request `{request}` require permissions `{permissions}`')
-        consumer, auth_scheme = self.authenticate(request)
-        self.context.logger.debug(f'Authenticated consumer `{consumer}` with scheme `{auth_scheme}`')
-        authorization: Authorization = self.get_authorization_class()(context=self.context)
+        consumer = self.authenticate(request)
+        self.context.logger.debug(f'Authenticated consumer.user `{consumer.user}` with scheme `{consumer.auth_scheme}`')
+        authorization: BitmaskAuthorization = self.get_authorization_class()(context=self.context)
         authorization.authorize(consumer, permissions, aggregation_type)
         self.context.logger.debug('The consumer required permissions are granted')
         return consumer
 
-    def get_authorization_class(self) -> Type[Authorization]:
+    def get_authorization_class(self) -> Type[BitmaskAuthorization]:
         """Return an `Authorization` or one of its diverted class that checks whether the consumer has the necessary
         permissions.
         """
         return self.authorization_class
-
-    def get_consumer_class(self) -> Type[Consumer]:
-        """Return the `Consumer` or its derived class that represents the data structure of the consumer."""
-        return self.consumer_class
 
     @abc.abstractmethod
     def create_view_func_wrapper(
@@ -84,10 +80,10 @@ class WebBridge(abc.ABC):
         """Factory method. Creates a callable object to wrap the view function that require the `permissions`."""
 
     @abc.abstractmethod
-    def authenticate(self, request) -> tuple[Consumer, str]:
+    def authenticate(self, request) -> Consumer:
         """Authenticate requests.
 
         :param request: the HTTP request object
         :type request: Union['fastapi.Request', 'flask.Request', 'django.http.Request' ... etc.]
-        :return: an instance of `Consumer` or its derived class, a string indicating the auth-scheme
+        :return: an instance of `Consumer` or its derived class
         """

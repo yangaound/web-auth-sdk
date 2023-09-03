@@ -5,21 +5,10 @@ from typing import Type
 from flask import Request
 from flask import request as flask_request
 
-from web_auth import (
-    AuthException,
-    Consumer,
-    Context,
-    ErrorCode,
-    JWTAuthorization,
-    JWTConsumer,
-    PermissionAggregationTypeEnum,
-    WebBridge,
-)
+from web_auth import AuthException, Consumer, Context, ErrorCode, JWTUser, PermissionAggregationTypeEnum, WebBridge
 
 
 class FlaskBridge(WebBridge):
-    authorization_class = JWTAuthorization
-
     def __init__(self, context: Context):
         super().__init__(context)
 
@@ -34,7 +23,7 @@ class FlaskBridge(WebBridge):
         def decorator(func):
             func_signature = signature(func)
 
-            consumer_class: Type[Consumer] = self.get_consumer_class()
+            consumer_class: Type[Consumer] = self.consumer_class
             consumer_parma_name = next(
                 (
                     k
@@ -71,10 +60,11 @@ class FlaskBridge(WebBridge):
 
         return decorator
 
-    def authenticate(self, request: Request) -> tuple[Consumer, str]:
-        """Authenticate requests. return (consumer, consumer_auth_type)
+    def authenticate(self, request: Request) -> Consumer:
+        """Authenticate requests.
 
         :param request: the HTTP request object
+        :return: an instance of `Consumer` or its derived class
         """
         _bearer_token = request.headers.get('Authorization') or ''
         _token = (
@@ -86,4 +76,10 @@ class FlaskBridge(WebBridge):
             raise AuthException(message='Unauthorized', code=ErrorCode.UNAUTHORIZED)
 
         jwt_payload = self.decode_jwt_token(_token)
-        return JWTConsumer(**jwt_payload), 'JWT'
+        user = JWTUser(**jwt_payload)
+        return Consumer(
+            permission_bitmask=jwt_payload['permission_bitmask'],
+            user=user,
+            auth_scheme='JWT',
+            credential=_token,
+        )

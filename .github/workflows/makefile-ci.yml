@@ -25,7 +25,10 @@ jobs:
         poetry env use python
         poetry install
         
+    - name: Run build
+      run: |
+        make
+
     - name: Run test
       run: |
-        make lint
         make test

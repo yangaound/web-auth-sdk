@@ -1,16 +1,20 @@
-import abc
 import base64
 
 from .enum import ErrorCode, PermissionAggregationTypeEnum
 from .exception import AuthException
-from .model import Consumer, JWTConsumer, PermissionModel
+from .model import Consumer, PermissionModel
 
 
-class Authorization(abc.ABC):
+class BitmaskAuthorization(object):
+    """Authorize access to resources.
+
+    If the user lacks the necessary permissions, an `AuthException` is raised, including the relevant error
+    code as defined in `ErrorCode`.
+    """
+
     def __init__(self, context):
         self.context = context
 
-    @abc.abstractmethod
     def authorize(
         self,
         consumer: Consumer,
@@ -23,24 +27,8 @@ class Authorization(abc.ABC):
         :param permissions: the permissions the users required
         :param aggregation_type: aggregate method of applying permissions; all permissions are needed or just any.
         """
-        raise NotImplementedError
-
-
-class JWTAuthorization(Authorization):
-    """Authorize access to resources based on a JSON Web Token (JWT).
-
-    If the user does not have the required permissions, an `AuthException` is raised with the
-    appropriate error code defined in `ErrorCode`.
-    """
-
-    def authorize(
-        self,
-        consumer: JWTConsumer,
-        permissions: set[str],
-        aggregation_type: PermissionAggregationTypeEnum,
-    ):
         permission_bitmask = self.convert_base64encoded_to_bitmask(consumer.permission_bitmask)
-        return self.check_permissions(
+        self.check_permissions(
             permissions,
             aggregation_type,
             permission_bitmask,
