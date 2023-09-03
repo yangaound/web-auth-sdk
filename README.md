@@ -136,7 +136,7 @@ or
         return []
     ```
 
-  - ### Retrieve the consumer
+- ### Retrieve the consumer
 
     ```python
     import fastapi
@@ -152,7 +152,7 @@ or
         }
     ```
   
-    - ### Implement Fine-Grained Permission Control
+- ### Implement Fine-Grained Permission Control
 
     ```python
     import fastapi
