@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bridge.apps.BridgeConfig',
-    'web_auth.django',
 ]
 
 MIDDLEWARE = [

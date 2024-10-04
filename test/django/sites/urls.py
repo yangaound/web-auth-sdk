@@ -16,6 +16,5 @@ Including another URLconf
 from django.urls import include, path
 
 urlpatterns = [
-    path('', include('web_auth.django.urls')),
     path('', include('bridge.urls')),
 ]
