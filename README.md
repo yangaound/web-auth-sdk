@@ -7,8 +7,6 @@ The web-auth-sdk is an authorization SDK that is used to build protected Web API
 It provides the ability to intercept incoming requests and inject custom logic for authentication and authorization
 before the request reaches the view function.
 
-In addition, it supports Google OAuth2 for logging in and session logging in.
-
 To access protected APIs, clients should authenticate by passing authorizations. For example, a JWT key can be used as follows:
    ```shell
      curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
@@ -268,26 +266,3 @@ or
     def get_tickets() -> list[object]:
         pass
     ```
-  
-- ### Oauth2 client
-    1. Install apps to `settings.py`
-    ```python
-    INSTALLED_APPS = [
-        'web_auth.django'
-    ]
-    ```
-
-    2. Register url to `urls.py`
-    ```python
-    urlpatterns = [
-        django.urls.path('', django.urls.include('web_auth.django.urls')),
-    ]
-    ```
-  
-    3. Login with Google
-    - http://api.example.com/google/login
-    - http://api.example.com/google/auth
-  
-    4. Session Login
-    - http://api.example.com/session/csrftoken
-    - http://api.example.com/session/login
