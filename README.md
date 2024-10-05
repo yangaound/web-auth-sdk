@@ -1,43 +1,53 @@
 # web-auth-sdk
-<img src="https://img.shields.io/github/actions/workflow/status/yangaound/web-auth-sdk/makefile-ci.yml?branch=main" /><img src="https://img.shields.io/pypi/v/web-auth-sdk" />
-<img src="https://img.shields.io/badge/license-MIT-green.svg" />
-<img src="https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg" />
 
-The web-auth-sdk is an authorization SDK that is used to build protected Web APIs.
-It provides the ability to intercept incoming requests and inject custom logic for authentication and authorization
-before the request reaches the view function.
+![CI Status](https://img.shields.io/github/actions/workflow/status/yangaound/web-auth-sdk/makefile-ci.yml?branch=main)
+![PyPI Version](https://img.shields.io/pypi/v/web-auth-sdk)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)
+
+Authorization SDK for building protected Web APIs.
+It allows your endpoints to perform custom authorization and authentication before the request reaches the view function.
+Then it passes the consumer object to the view function for further processing.
 
 To access protected APIs, clients should authenticate by passing authorizations. For example, a JWT key can be used as follows:
-   ```shell
-     curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
-     curl 'http://api.example.com/resources?access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
-     curl 'http://api.example.com/resources' --cookie 'access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
-   ```
->  **_TIP:_**
-> When utilizing FastAPI, click the lock symbol on Swagger UI to include your JWT.
-> Run `make startup` for a quick preview.
-![img.png](usr/share/img/IncludeJWT.png)
+  
+```bash
+curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
+curl 'http://api.example.com/resources?access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
+```
+
+>  **TIP**: When utilizing FastAPI, click the lock symbol on Swagger UI to include your JWT. 
+> Run <code style="color: orange;">make startup</code> for a quick preview.
+> ![img.png](usr/share/img/IncludeJWT.png)
 
 ## Requirements
+
 - Python 3.8+
-- FastAPI 0.80+ (recommended)
+- FastAPI 0.109.0+ (recommended)
 - Django 4.0+ (optional)
 - Flask 2.0+ (optional)
 
 ## Installation
-   ```shell
-   pip install web-auth-sdk
-   ```
-or
-   ```shell
-   git clone https://github.com/yangaound/web-auth-sdk
-   cd web-auth-sdk && poetry install
-   ```
+
+-
+    ```bash
+    pip install web-auth-sdk
+    ```
+
+    or
+-
+    ```bash
+    git clone https://github.com/yangaound/web-auth-sdk
+    cd web-auth-sdk && poetry install
+    ```
 
 ## Permission Representation
-1. Permission list, located at `usr/etc/permissions.json` file:
+
+1. **Permission list**, located in the `usr/etc/permissions.json` file:
+
     ```python
-    permissions = [
+
+   permissions = [
         {'bitmask_idx': 0, 'codename': 'add_order', 'name': 'Can add order', 'service': 'order'},
         {'bitmask_idx': 1, 'codename': 'change_order', 'name': 'Can change order', 'service': 'order'},
         {'bitmask_idx': 2, 'codename': 'delete_order', 'name': 'Can delete order', 'service': 'order'},
@@ -49,20 +59,21 @@ or
     ]
     ```
 
-2. How to grant permissions?
+2. **How to grant permissions?**
 
-   Permissions are encoded using a bitmask of length n that is a multiple of 24.
-   Each permission is represented by a 1 on the corresponding `bitmask_idx`-th position in the bitmask, indicating that
-   the permission is granted.
+    Permissions are encoded using a bitmask of length *n* that is a multiple of 24.
+    Each permission is represented by a `1` at the corresponding `bitmask_idx`-th position in the bitmask, indicating that
+    the permission is granted.
 
+3. **Base64-encoded bitmask**
 
-3. Base64-encoded the bitmask
-    
     | Bitmask                                          | Base64-encoded |
     |--------------------------------------------------|----------------|
     | 111111111111111111111111111111110111111101111111 | /////39/       |
 
-4. Decoded/Encoded JWT
+4. **Decoded/Encoded JWT**
+
+    Decoded JWT:
     ```json
     {
       "user_id": 1,
@@ -71,6 +82,8 @@ or
       "exp": 1678800187
     }
     ```
+
+    Encoded JWT:
     ```text
     eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG1hc2siOiIvLy8vLzM5LyIsImlhdCI6MTY3ODc5ODk4MCwiZXhwIjoxNjc4ODAwMTg3fQ
     ```
