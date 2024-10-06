@@ -26,7 +26,9 @@ test_django:
 	poetry run pytest -s --log-cli-level=DEBUG --ignore=test/fastapi --ignore=test/flask
 
 test_versions:
-	poetry run tox
+	poetry run tox -c fastapi-tox.ini; \
+	poetry run tox -c flask-tox.ini; \
+	poetry run tox -c django-tox.ini;
 
 clean:
 	@if [ -d "build" ]; then \

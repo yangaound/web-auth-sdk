@@ -9,8 +9,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    if: github.ref == 'refs/heads/develop' || (github.ref == 'refs/heads/main' && contains(github.event.release.tag_name, 'last-release'))
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
