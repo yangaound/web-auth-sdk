@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "web-auth-sdk"
-version = "1.2.0-rc"
+version = "1.2.0"
 description = "authorization SDK used to build protected Web APIs"
 authors = ["Yin Long <yangaound@gmail.com>"]
 license = "MIT"
@@ -28,7 +28,7 @@ packages = [
     { include = "web_auth" },
 ]
 [tool.poetry.dependencies]
-python = ">=3.8.0,<3.12"
+python = ">=3.8,<3.13"
 PyJWT = ">=2.2.0,<3.0"
 pydantic = "^1.10.6"
 

@@ -29,17 +29,14 @@ curl 'http://api.example.com/resources?access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNz
 
 ## Installation
 
--
-    ```bash
-    pip install web-auth-sdk
-    ```
-
-    or
--
-    ```bash
-    git clone https://github.com/yangaound/web-auth-sdk
-    cd web-auth-sdk && poetry install
-    ```
+```bash
+pip install web-auth-sdk
+```
+or
+```bash
+git clone https://github.com/yangaound/web-auth-sdk
+cd web-auth-sdk && poetry install
+```
 
 ## Permission Representation
 
