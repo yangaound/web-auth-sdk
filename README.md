@@ -16,7 +16,7 @@ curl 'http://api.example.com/resources' -H 'Authorization: Bearer eyJ1c2VyX2lkIj
 curl 'http://api.example.com/resources?access_token=eyJ1c2VyX2lkIjoxLCJwZXJtaXNzaW9uX2JpdG'
 ```
 
->  **TIP**: When utilizing FastAPI, click the lock symbol on Swagger UI to include your JWT. 
+>  **TIP**: In FastAPI's Swagger UI, click the lock icon to add your JWT for authentication.
 > Run <code style="color: orange;">make startup</code> for a quick preview.
 > ![img.png](usr/share/img/IncludeJWT.png)
 

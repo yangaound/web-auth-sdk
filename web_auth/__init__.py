@@ -9,6 +9,9 @@ from .core.exception import AuthException
 from .core.model import Consumer, ErrorMessageModel, JWTUser, PermissionModel
 from .core.storage import JsonFileStorage, Storage
 
+__version__ = '1.2.0'
+
+
 _ = (
     Config,
     WebBridge,
