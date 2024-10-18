@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out the repository
+      uses: actions/checkout@v3
+        
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -20,8 +22,18 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install poetry
-        poetry env use python
         poetry install
+
+    - name: Get the tag name
+      run: |
+        echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        echo "Set TAG_NAME=$TAG_NAME to env"
+
+    - name: Update version in pyproject.toml & web_auth/__init__.py
+      run: |
+        echo "Updating version to ${{ env.TAG_NAME }}"
+        poetry version ${{ env.TAG_NAME }}
+        sed -i "s/__version__ *= *.*/__version__ = '$TAG_NAME'/g" ./web_auth/__init__.py
 
     - name: Build and publish package
       env:
@@ -29,3 +41,14 @@ jobs:
       run: |
         poetry build
         poetry publish
+
+    - name: Push changes to the main branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ !github.event.release.prerelease }}
+      run: |
+        git config user.name "github-action Bot"
+        git config user.email "action.bot@github.com"
+        git add pyproject.toml ./web_auth/__init__.py
+        git commit -m "Update version to ${{ env.TAG_NAME }}" || echo "No changes to commit"
+        git push origin HEAD:main || echo "Can not push changes"
